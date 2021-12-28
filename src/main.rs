@@ -1,7 +1,10 @@
 mod commands;
 mod utils;
+mod config;
+mod consts;
 
 use clap::{AppSettings, Parser, Subcommand};
+use confy;
 
 #[derive(Parser)]
 #[clap(name = "Noto")]
@@ -27,16 +30,18 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// create a new note with current timestamp for id
-    New,
+    New { template_path: Option<String> },
 }
 
 fn main() -> Result<(), confy::ConfyError> {
-    let cfg = confy::load("noto")?;
+    let cfg: config::NotoConfig = confy::load("noto")?;
+    dbg!(&cfg);
+
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::New => {
-            commands::new();
+        Commands::New { template_path } => {
+            commands::new(&cfg.default_template.to_string(), template_path).unwrap();
         }
     }
 
