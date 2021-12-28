@@ -1,11 +1,12 @@
 use chrono::{DateTime, Local};
 
 use crate::utils;
+use crate::config::NotoConfig;
 use crate::consts::ZETTELKASTEN;
 
 
-pub fn new(default_template: &String, template_path: &Option<String>) -> std::io::Result<()> {
-    let mut template: String = match default_template.as_str() {
+pub fn new(cfg: NotoConfig, template_path: &Option<String>) -> std::io::Result<()> {
+    let mut template: String = match cfg.default_template.as_str() {
         "zettelkasten" => ZETTELKASTEN.to_string(),
         _ => ZETTELKASTEN.to_string(),
     };
@@ -17,9 +18,9 @@ pub fn new(default_template: &String, template_path: &Option<String>) -> std::io
 
     // generate datetime-stamp to use for filename
     let now: DateTime<Local> = Local::now();
-    let note_name = now.format("%Y%m%d%H%M%S").to_string() + ".md";
+    let note_path = format!("{}{}.md", cfg.base_folder.as_str(), now.format("%Y%m%d%H%M%S").to_string());
 
-    let result = utils::create_file(&note_name, template);
+    let result = utils::create_file(&note_path, template);
     if result.is_err() {
         panic!("ERROR: {:?}", result.err());
     }

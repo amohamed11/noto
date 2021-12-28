@@ -10,7 +10,7 @@ impl ::std::default::Default for NotoConfig {
     fn default() -> Self {
         Self {
             default_template: "zettalkasten".to_string(),
-            base_folder: "~/Noto/".to_string(),
+            base_folder: "/tmp/Noto/".to_string(),
         }
     }
 }
