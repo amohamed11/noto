@@ -1,0 +1,5 @@
+- [ ] Allow users to set their default editor
+- [ ] Open newly created note in user's default editor
+- [ ] Command for re-opening most recently create note
+- [ ] Search through all notes (using Ripgrep) for keywords
+- [ ] Display search results in a user-friendly format, allowing users to open specific result
