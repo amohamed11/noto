@@ -1,3 +1,6 @@
+mod commands;
+mod utils;
+
 use clap::{AppSettings, Parser, Subcommand};
 
 #[derive(Parser)]
@@ -15,6 +18,10 @@ struct Cli {
     /// Set the folder for storing your notes
     #[clap(short, long)]
     folder: Option<String>,
+
+    /// Path for configuration file. Default is ~/.config/noto/config.
+    #[clap(short, long)]
+    config: Option<String>,
 }
 
 #[derive(Subcommand)]
@@ -23,12 +30,15 @@ enum Commands {
     New,
 }
 
-fn main() {
+fn main() -> Result<(), confy::ConfyError> {
+    let cfg = confy::load("noto")?;
     let cli = Cli::parse();
 
     match &cli.command {
         Commands::New => {
-            println!("Noto out!");
+            commands::new();
         }
     }
+
+    Ok(())
 }
