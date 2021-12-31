@@ -29,7 +29,10 @@ enum Commands {
     New { template_path: Option<String> },
 
     /// Set the folder for storing your notes. Make sure the folder path is absolute.
-    SetFolder { folder: Option<String> },
+    SetFolder { folder: String },
+
+    /// Set editor to use for opening the new note.
+    SetEditor { editor: String },
 }
 
 
@@ -59,14 +62,17 @@ fn main() -> Result<(), std::io::Error> {
         },
 
         Commands::SetFolder { folder } => {
-            // update folder if user passed folder flag
-            let mut new_folder: String = cfg.base_folder;
-            if let Some(path) = folder {
-                new_folder = path.to_string();
-            };
-
             let cfg = config::NotoConfig {
-                base_folder: new_folder,
+                base_folder: folder.to_string(),
+                ..cfg
+            };
+            confy::store("noto", &cfg).expect("Couldn't update configuration file");
+            dbg!(&cfg);
+        },
+
+        Commands::SetEditor { editor } => {
+            let cfg = config::NotoConfig {
+                editor: editor.to_string(),
                 ..cfg
             };
             confy::store("noto", &cfg).expect("Couldn't update configuration file");

@@ -1,17 +1,17 @@
+use std::process::Command;
 use chrono::{DateTime, Local};
 
 use crate::utils;
 use crate::config::NotoConfig;
-use crate::consts::ZETTELKASTEN;
+use crate::consts::DEFAULT_TEMPLATE;
 
 
 pub fn new(cfg: NotoConfig, template_path: &Option<String>) -> std::io::Result<()> {
-    let mut template: String = match cfg.default_template.as_str() {
-        "zettelkasten" => ZETTELKASTEN.to_string(),
-        _ => ZETTELKASTEN.to_string(),
+    let mut template: String = match cfg.template.as_str() {
+        "default" => DEFAULT_TEMPLATE.to_string(),
+        _ => DEFAULT_TEMPLATE.to_string(),
     };
 
-    //TODO handle using custom templates from files
     if template_path.is_some() {
         template = utils::read_file(template_path.as_ref().unwrap().as_str())?;
     }
@@ -24,7 +24,11 @@ pub fn new(cfg: NotoConfig, template_path: &Option<String>) -> std::io::Result<(
     if result.is_err() {
         panic!("ERROR: {:?}", result.err());
     }
-    println!("Noto out!");
+
+    Command::new(cfg.editor)
+        .arg(&note_path)
+        .status()
+        .expect("Could not open the new note using the default editor");
 
     Ok(())
 }
