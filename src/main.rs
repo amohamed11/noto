@@ -7,8 +7,7 @@ mod config;
 mod consts;
 
 #[derive(Parser)]
-#[clap(name = "Noto")]
-#[clap(author = "Anas M. <mail@amohamed.ca>")]
+#[clap(name = consts::APP_NAME)]
 #[clap(version = "0.1")]
 #[clap(about = "A minimal note-taking cli tool for jogging down your thoughts quickly.")]
 #[clap(global_setting(AppSettings::PropagateVersion))]
@@ -38,14 +37,7 @@ enum Commands {
 
 fn main() -> Result<(), std::io::Error> {
     let cli: Cli = Cli::parse();
-    let cfg: config::NotoConfig =  {
-        if let Some(path) = cli.config {
-            confy::load_path(path)
-        } else {
-            confy::load("noto")
-        }
-        .expect("Failed to read config")
-    };
+    let cfg: config::NotoConfig = confy::load(consts::APP_NAME).expect("Failed to read config");
 
     match &cli.command {
         Commands::New { template_path } => {
@@ -66,7 +58,7 @@ fn main() -> Result<(), std::io::Error> {
                 base_folder: folder.to_string(),
                 ..cfg
             };
-            confy::store("noto", &cfg).expect("Couldn't update configuration file");
+            confy::store(consts::APP_NAME, &cfg).expect("Couldn't update configuration file");
             dbg!(&cfg);
         },
 
@@ -75,7 +67,7 @@ fn main() -> Result<(), std::io::Error> {
                 editor: editor.to_string(),
                 ..cfg
             };
-            confy::store("noto", &cfg).expect("Couldn't update configuration file");
+            confy::store(consts::APP_NAME, &cfg).expect("Couldn't update configuration file");
             dbg!(&cfg);
         }
     }
