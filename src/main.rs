@@ -25,7 +25,7 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// create a new note with current timestamp for id
-    New { template_path: Option<String> },
+    New { name: Option<String> },
 
     /// Set the folder for storing your notes. Make sure the folder path is absolute.
     SetFolder { folder: String },
@@ -40,17 +40,17 @@ fn main() -> Result<(), std::io::Error> {
     let cfg: config::NotoConfig = confy::load(consts::APP_NAME).expect("Failed to read config");
 
     match &cli.command {
-        Commands::New { template_path } => {
+        Commands::New { name } => {
             dbg!(&cfg);
             // warn user about selecting a proper base folder for Noto
             if cfg.base_folder == consts::DEFAULT_BASE_FOLDER {
-                println!("No base folder selected. Noto will continue using /tmp/Noto/ for now, please select a base folder using the `folder` command.")
+                println!("No base folder selected. Noto will continue using /tmp/Noto/ for now. Change this using the `set-folder` command.")
             }
 
             // create base folder if it doesn't already exist
             utils::create_base_folder(&cfg.base_folder)?;
 
-            commands::new(cfg, template_path).unwrap();
+            commands::new(cfg, name).unwrap();
         },
 
         Commands::SetFolder { folder } => {

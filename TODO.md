@@ -11,3 +11,4 @@
 ## Done
 - [x] Allow users to set their default editor & notes directory
 - [x] Open newly created note in user's default editor
+- [x] Create notes with custom names instead of timestamps

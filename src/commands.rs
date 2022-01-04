@@ -1,24 +1,40 @@
+use std::io::{self, Write};
+use std::path::Path;
 use std::process::Command;
-use chrono::{DateTime, Local};
+use chrono::Local;
 
 use crate::utils;
 use crate::config::NotoConfig;
 use crate::consts::DEFAULT_TEMPLATE;
 
 
-pub fn new(cfg: NotoConfig, template_path: &Option<String>) -> std::io::Result<()> {
-    let mut template: String = match cfg.template.as_str() {
+pub fn new(cfg: NotoConfig, name: &Option<String>) -> std::io::Result<()> {
+    let template: String = match cfg.template.as_str() {
         "default" => DEFAULT_TEMPLATE.to_string(),
         _ => DEFAULT_TEMPLATE.to_string(),
     };
 
-    if template_path.is_some() {
-        template = utils::read_file(template_path.as_ref().unwrap().as_str())?;
+    // if no name was provided, generate datetime-stamp to use for filename
+    let filename: String;
+    if let Some(name) = name {
+        filename = name.to_string();
+    } else {
+        filename = Local::now().format("%Y%m%d%H%M%S").to_string();
     }
+    let note_path = format!("{}{}.md", cfg.base_folder.as_str(), filename);
+    
+    // check if path with name already exists, if so warn the user
+    if Path::new(&note_path).exists() {
+        print!("A file named {} already exists. Do you want to overwrite it? [y/n]: ", filename);
+        io::stdout().flush()?;
 
-    // generate datetime-stamp to use for filename
-    let now: DateTime<Local> = Local::now();
-    let note_path = format!("{}{}.md", cfg.base_folder.as_str(), now.format("%Y%m%d%H%M%S").to_string());
+        let mut buffer = String::new();
+        let stdin = io::stdin();
+
+        stdin.read_line(&mut buffer)?;
+
+        // TODO handle overwiting file
+    }
 
     let result = utils::create_file(&note_path, template);
     if result.is_err() {
