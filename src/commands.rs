@@ -15,12 +15,13 @@ pub fn new(cfg: NotoConfig, name: &Option<String>) -> std::io::Result<()> {
     };
 
     // if no name was provided, generate datetime-stamp to use for filename
-    let filename: String;
-    if let Some(name) = name {
-        filename = name.to_string();
-    } else {
-        filename = Local::now().format("%Y%m%d%H%M%S").to_string();
-    }
+    let filename: String = {
+        if name.is_some() {
+            name.as_ref().unwrap().to_string()
+        } else {
+            Local::now().format("%Y%m%d%H%M%S").to_string()
+        }
+    };
     let note_path = format!("{}{}.md", cfg.base_folder.as_str(), filename);
     
     // check if path with name already exists, if so warn the user
@@ -33,13 +34,14 @@ pub fn new(cfg: NotoConfig, name: &Option<String>) -> std::io::Result<()> {
 
         stdin.read_line(&mut buffer)?;
 
-        // TODO handle overwiting file
+        match buffer.trim() {
+            "y" | "Y" | "yes" | "Yes" => utils::create_file(&note_path, template).expect("Error creating note: "),
+            _ => ()
+        }
+    } else {
+        utils::create_file(&note_path, template).expect("Error creating note: ");
     }
 
-    let result = utils::create_file(&note_path, template);
-    if result.is_err() {
-        panic!("ERROR: {:?}", result.err());
-    }
 
     Command::new(cfg.editor)
         .arg(&note_path)

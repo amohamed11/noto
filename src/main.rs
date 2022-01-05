@@ -41,7 +41,6 @@ fn main() -> Result<(), std::io::Error> {
 
     match &cli.command {
         Commands::New { name } => {
-            dbg!(&cfg);
             // warn user about selecting a proper base folder for Noto
             if cfg.base_folder == consts::DEFAULT_BASE_FOLDER {
                 println!("No base folder selected. Noto will continue using /tmp/Noto/ for now. Change this using the `set-folder` command.")
